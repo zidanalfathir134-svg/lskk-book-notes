@@ -7,13 +7,15 @@ import type { IBook } from '../../types/book';
 interface IBookFormProps {
   open: boolean;
   editingBook: IBook | null;
+  loading: boolean;
   onClose: () => void;
-  onSubmit: (values: BookFormValues) => void;
+  onSubmit: (values: BookFormValues) => void | Promise<void>;
 }
 
 function BookForm({
   open,
   editingBook,
+  loading,
   onClose,
   onSubmit,
 }: IBookFormProps) {
@@ -62,15 +64,12 @@ function BookForm({
       }}
       footer={null}
       destroyOnHidden
+      maskClosable={!loading}
+      closable={!loading}
     >
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="space-y-4"
-      >
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
-          <label className="mb-1 block font-medium">
-            Judul Buku
-          </label>
+          <label className="mb-1 block font-medium">Judul Buku</label>
 
           <Controller
             name="title"
@@ -79,21 +78,18 @@ function BookForm({
               <Input
                 {...field}
                 placeholder="Masukkan judul buku"
+                disabled={loading}
               />
             )}
           />
 
           {errors.title && (
-            <p className="mt-1 text-sm text-red-500">
-              {errors.title.message}
-            </p>
+            <p className="mt-1 text-sm text-red-500">{errors.title.message}</p>
           )}
         </div>
 
         <div>
-          <label className="mb-1 block font-medium">
-            Penulis
-          </label>
+          <label className="mb-1 block font-medium">Penulis</label>
 
           <Controller
             name="author"
@@ -102,21 +98,18 @@ function BookForm({
               <Input
                 {...field}
                 placeholder="Masukkan nama penulis"
+                disabled={loading}
               />
             )}
           />
 
           {errors.author && (
-            <p className="mt-1 text-sm text-red-500">
-              {errors.author.message}
-            </p>
+            <p className="mt-1 text-sm text-red-500">{errors.author.message}</p>
           )}
         </div>
 
         <div>
-          <label className="mb-1 block font-medium">
-            Tahun Terbit
-          </label>
+          <label className="mb-1 block font-medium">Tahun Terbit</label>
 
           <Controller
             name="publishedYear"
@@ -129,6 +122,7 @@ function BookForm({
                   field.onChange(value ?? undefined);
                 }}
                 placeholder="Contoh: 2024"
+                disabled={loading}
               />
             )}
           />
@@ -141,9 +135,7 @@ function BookForm({
         </div>
 
         <div>
-          <label className="mb-1 block font-medium">
-            Deskripsi
-          </label>
+          <label className="mb-1 block font-medium">Deskripsi</label>
 
           <Controller
             name="description"
@@ -153,6 +145,7 @@ function BookForm({
                 {...field}
                 rows={4}
                 placeholder="Masukkan deskripsi buku"
+                disabled={loading}
               />
             )}
           />
@@ -165,11 +158,11 @@ function BookForm({
         </div>
 
         <div className="flex justify-end gap-2">
-          <Button onClick={onClose}>
+          <Button onClick={onClose} disabled={loading}>
             Batal
           </Button>
 
-          <Button type="primary" htmlType="submit">
+          <Button type="primary" htmlType="submit" loading={loading}>
             {editingBook ? 'Simpan Perubahan' : 'Tambah Buku'}
           </Button>
         </div>

@@ -1,75 +1,120 @@
-# React + TypeScript + Vite
+# LSKK Book Notes
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Frontend web application untuk mengelola data buku secara sederhana, dibuat sebagai bagian dari onboarding PKL Frontend Web Development di PT. Langgeng Sejahtera Kreasi Komputasi (LSKK).
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- React
+- TypeScript
+- Vite
+- Tailwind CSS
+- Ant Design
+- React Hook Form
+- Zod
+- Zustand
+- TanStack Query
+- Axios
+- React Router
+- Axios Mock Adapter
 
-## React Compiler
+## Fitur
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Login dengan validasi form
+- Persistensi status autentikasi
+- Protected route
+- Menampilkan daftar buku
+- Pagination
+- Menambahkan buku
+- Mengedit buku
+- Menghapus buku
+- Validasi form menggunakan Zod
+- Loading state pada proses submit
+- Response API menggunakan format `IResponseEntity`
+- Mock API menggunakan Axios Mock Adapter
+- Penyimpanan data buku menggunakan localStorage
 
-## Expanding the ESLint configuration
+## Struktur Folder
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```text
+src/
+├── components/
+├── layouts/
+├── pages/
+│   ├── Login/
+│   └── Books/
+├── router/
+├── services/
+│   └── mock/
+├── stores/
+├── types/
+├── App.tsx
+├── main.tsx
+└── index.css
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+## Instalasi
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Clone repository kemudian masuk ke folder project:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+git clone https://github.com/zidanalfathir134-svg/lskk-book-notes
+cd lskk-book-notes
 ```
+
+Install dependency:
+
+```bash
+npm install
+```
+
+## Environment
+
+Buat file `.env` pada root project:
+
+```env
+VITE_API_URL=http://localhost:3000/api
+VITE_USE_MOCK=true
+```
+
+File `.env` tidak disimpan ke repository.
+
+## Menjalankan Project
+
+Jalankan development server:
+
+```bash
+npm run dev
+```
+
+Kemudian buka alamat yang ditampilkan oleh Vite pada terminal.
+
+## Login Mock
+
+Karena project saat ini menggunakan mock API, gunakan akun berikut:
+
+```text
+Username: admin
+Password: admin123
+```
+
+## Build
+
+Untuk melakukan pengecekan production build:
+
+```bash
+npm run build
+```
+
+## Lint
+
+Untuk melakukan pengecekan kode menggunakan ESLint:
+
+```bash
+npm run lint
+```
+
+## Catatan
+
+Project menggunakan Axios Mock Adapter sebagai simulasi backend selama proses onboarding. Data buku disimpan pada localStorage sehingga perubahan data tetap dapat digunakan selama browser masih menyimpan data project.
+
+Setelah backend tersedia, service pada folder `src/services/` dapat diarahkan ke API backend yang sebenarnya.

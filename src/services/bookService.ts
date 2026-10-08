@@ -1,155 +1,42 @@
-import type { IBook } from '../types/book';
+import api from './api';
 import type { IResponseEntity } from '../types/api';
-
-const STORAGE_KEY = 'lskk-books';
-
-const initialBooks: IBook[] = [
-  {
-    id: 1,
-    title: 'Clean Code',
-    author: 'Robert C. Martin',
-    description: 'A handbook of agile software craftsmanship.',
-    publishedYear: 2008,
-  },
-  {
-    id: 2,
-    title: 'The Pragmatic Programmer',
-    author: 'Andrew Hunt',
-    description: 'A practical guide to software development.',
-    publishedYear: 1999,
-  },
-  {
-    id: 3,
-    title: 'Design Patterns',
-    author: 'Erich Gamma',
-    description: 'Elements of reusable object-oriented software.',
-    publishedYear: 1994,
-  },
-  {
-    id: 4,
-    title: 'Refactoring',
-    author: 'Martin Fowler',
-    description: 'Improving the design of existing code.',
-    publishedYear: 1999,
-  },
-  {
-    id: 5,
-    title: 'You Don’t Know JS',
-    author: 'Kyle Simpson',
-    description: 'A deep dive into JavaScript concepts.',
-    publishedYear: 2015,
-  },
-  {
-    id: 6,
-    title: 'Eloquent JavaScript',
-    author: 'Marijn Haverbeke',
-    description: 'Modern introduction to JavaScript programming.',
-    publishedYear: 2018,
-  },
-];
-
-const getStoredBooks = (): IBook[] => {
-  const storedBooks = localStorage.getItem(STORAGE_KEY);
-
-  if (!storedBooks) {
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify(initialBooks),
-    );
-
-    return [...initialBooks];
-  }
-
-  return JSON.parse(storedBooks) as IBook[];
-};
-
-const saveBooks = (books: IBook[]): void => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(books));
-};
+import type { IBook } from '../types/book';
 
 export const getBooks = async (
   page: number,
   limit: number,
 ): Promise<IResponseEntity<IBook[]>> => {
-  const books = getStoredBooks();
-
-  const startIndex = (page - 1) * limit;
-  const endIndex = startIndex + limit;
-
-  const paginatedBooks = books.slice(startIndex, endIndex);
-
-  const totalData = books.length;
-  const totalPages = Math.ceil(totalData / limit);
-
-  return {
-    code: 200,
-    status: true,
-    message: 'Books retrieved successfully',
-    data: paginatedBooks,
-    meta: {
-      totalPages,
-      totalData,
-      totalDataPerPage: limit,
+  const response = await api.get<IResponseEntity<IBook[]>>('/books', {
+    params: {
       page,
       limit,
     },
-  };
+  });
+
+  return response.data;
 };
 
 export const createBook = async (
   book: Omit<IBook, 'id'>,
-): Promise<IBook> => {
-  const books = getStoredBooks();
+): Promise<IResponseEntity<IBook>> => {
+  const response = await api.post<IResponseEntity<IBook>>('/books', book);
 
-  const newId =
-    books.length > 0
-      ? Math.max(...books.map((item) => item.id)) + 1
-      : 1;
-
-  const newBook: IBook = {
-    id: newId,
-    ...book,
-  };
-
-  const updatedBooks = [...books, newBook];
-
-  saveBooks(updatedBooks);
-
-  return newBook;
+  return response.data;
 };
 
 export const updateBook = async (
   id: number,
   book: Omit<IBook, 'id'>,
-): Promise<IBook> => {
-  const books = getStoredBooks();
+): Promise<IResponseEntity<IBook>> => {
+  const response = await api.put<IResponseEntity<IBook>>(`/books/${id}`, book);
 
-  const index = books.findIndex((item) => item.id === id);
-
-  if (index === -1) {
-    throw new Error('Book not found');
-  }
-
-  const updatedBook: IBook = {
-    id,
-    ...book,
-  };
-
-  books[index] = updatedBook;
-
-  saveBooks(books);
-
-  return updatedBook;
+  return response.data;
 };
 
 export const deleteBook = async (
   id: number,
-): Promise<void> => {
-  const books = getStoredBooks();
+): Promise<IResponseEntity<null>> => {
+  const response = await api.delete<IResponseEntity<null>>(`/books/${id}`);
 
-  const updatedBooks = books.filter(
-    (book) => book.id !== id,
-  );
-
-  saveBooks(updatedBooks);
+  return response.data;
 };
