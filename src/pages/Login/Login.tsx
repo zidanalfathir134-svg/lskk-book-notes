@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { login } from '../../services/authService';
 import { useAuthStore } from '../../stores/authStore';
 import { loginSchema, type LoginFormValues } from './LoginSchema';
+import { getErrorMessage } from '../../utils/getErrorMessage';
 
 function Login() {
   const navigate = useNavigate();
@@ -41,9 +42,11 @@ function Login() {
       navigate('/books', {
         replace: true,
       });
-    } catch {
-      message.error('Terjadi kesalahan saat login');
-    }
+    } catch (error: unknown) {
+  message.error(
+    getErrorMessage(error, 'Terjadi kesalahan saat login'),
+  );
+}
   };
 
   return (

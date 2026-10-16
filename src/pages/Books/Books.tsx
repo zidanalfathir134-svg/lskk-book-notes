@@ -8,6 +8,7 @@ import BookForm from './BookForm';
 import type { BookFormValues } from './bookSchema';
 import { useBookQuery } from './useBooks';
 import { useCreateBook, useDeleteBook, useUpdateBook } from './useBookMutation';
+import { getErrorMessage } from '../../utils/getErrorMessage';
 
 function Books() {
   const navigate = useNavigate();
@@ -61,9 +62,11 @@ function Books() {
       ) {
         setPage(page - 1);
       }
-    } catch {
-      message.error('Gagal menghapus buku');
-    }
+    } catch (error: unknown) {
+  message.error(
+    getErrorMessage(error, 'Gagal menghapus buku'),
+  );
+}
   },
   [
     deleteBookMutation,
@@ -95,9 +98,14 @@ function Books() {
         }
 
         handleCloseForm();
-      } catch {
-        message.error('Terjadi kesalahan saat menyimpan buku');
-      }
+      } catch (error: unknown) {
+  message.error(
+    getErrorMessage(
+      error,
+      'Terjadi kesalahan saat menyimpan buku',
+    ),
+  );
+}
     },
     [editingBook, updateBookMutation, createBookMutation, handleCloseForm],
   );
