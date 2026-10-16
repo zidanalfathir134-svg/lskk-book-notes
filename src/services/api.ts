@@ -9,39 +9,19 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const authStorage = localStorage.getItem('lskk-auth');
+  const token = useAuthStore.getState().token;
 
-  if (!authStorage) {
-    return config;
-  }
-
-  try {
-    const parsedAuth = JSON.parse(authStorage) as {
-      state?: {
-        token?: string | null;
-      };
-    };
-
-    const token = parsedAuth.state?.token;
-
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-  } catch {
-    localStorage.removeItem('lskk-auth');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
 
   return config;
 });
 
-
 api.interceptors.response.use(
   (response) => response,
   (error: unknown) => {
-    if (
-      axios.isAxiosError(error) &&
-      error.response?.status === 401
-    ) {
+    if (axios.isAxiosError(error) && error.response?.status === 401) {
       const requestUrl = error.config?.url ?? '';
       const isLoginRequest = requestUrl.includes('/auth/login');
 

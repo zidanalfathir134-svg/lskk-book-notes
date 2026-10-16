@@ -1,4 +1,4 @@
-import { Button, Empty, message, Popconfirm, Spin } from 'antd';
+import { Button, Empty, message, Popconfirm } from 'antd';
 import { DataGrid, type GridColDef } from '@mui/x-data-grid';
 import { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -31,7 +31,6 @@ function Books() {
   const totalPages = data?.meta?.totalPages ?? 0;
   const currentDataLength = data?.data?.length ?? 0;
 
-
   const handleLogout = useCallback((): void => {
     logout();
     navigate('/login');
@@ -48,33 +47,21 @@ function Books() {
   }, []);
 
   const handleDelete = useCallback(
-  async (id: number): Promise<void> => {
-    try {
-      const response =
-        await deleteBookMutation.mutateAsync(id);
+    async (id: number): Promise<void> => {
+      try {
+        const response = await deleteBookMutation.mutateAsync(id);
 
-      message.success(response.message);
+        message.success(response.message);
 
-      if (
-        totalPages > 1 &&
-        page === totalPages &&
-        currentDataLength === 1
-      ) {
-        setPage(page - 1);
+        if (totalPages > 1 && page === totalPages && currentDataLength === 1) {
+          setPage(page - 1);
+        }
+      } catch (error: unknown) {
+        message.error(getErrorMessage(error, 'Gagal menghapus buku'));
       }
-    } catch (error: unknown) {
-  message.error(
-    getErrorMessage(error, 'Gagal menghapus buku'),
+    },
+    [deleteBookMutation, totalPages, page, currentDataLength],
   );
-}
-  },
-  [
-    deleteBookMutation,
-    totalPages,
-    page,
-    currentDataLength,
-  ],
-);
 
   const handleCloseForm = useCallback((): void => {
     setIsFormOpen(false);
@@ -99,69 +86,64 @@ function Books() {
 
         handleCloseForm();
       } catch (error: unknown) {
-  message.error(
-    getErrorMessage(
-      error,
-      'Terjadi kesalahan saat menyimpan buku',
-    ),
-  );
-}
+        message.error(
+          getErrorMessage(error, 'Terjadi kesalahan saat menyimpan buku'),
+        );
+      }
     },
     [editingBook, updateBookMutation, createBookMutation, handleCloseForm],
   );
 
   const columns: GridColDef<IBook>[] = useMemo(
-  () => [
-    {
-      field: 'title',
-      headerName: 'Judul',
-      flex: 1,
-      minWidth: 180,
-    },
-    {
-      field: 'author',
-      headerName: 'Penulis',
-      flex: 1,
-      minWidth: 160,
-    },
-    {
-      field: 'description',
-      headerName: 'Deskripsi',
-      flex: 2,
-      minWidth: 250,
-    },
-    {
-      field: 'publishedYear',
-      headerName: 'Tahun Terbit',
-      width: 130,
-    },
-    {
-      field: 'action',
-      headerName: 'Aksi',
-      width: 190,
-      sortable: false,
-      filterable: false,
-      renderCell: (params) => (
-        <div className="flex h-full items-center gap-2">
-          <Button onClick={() => handleEdit(params.row)}>
-            Edit
-          </Button>
+    () => [
+      {
+        field: 'title',
+        headerName: 'Judul',
+        flex: 1,
+        minWidth: 180,
+      },
+      {
+        field: 'author',
+        headerName: 'Penulis',
+        flex: 1,
+        minWidth: 160,
+      },
+      {
+        field: 'description',
+        headerName: 'Deskripsi',
+        flex: 2,
+        minWidth: 250,
+      },
+      {
+        field: 'publishedYear',
+        headerName: 'Tahun Terbit',
+        width: 130,
+      },
+      {
+        field: 'action',
+        headerName: 'Aksi',
+        width: 190,
+        sortable: false,
+        filterable: false,
+        renderCell: (params) => (
+          <div className="flex h-full items-center gap-2">
+            <Button onClick={() => handleEdit(params.row)}>Edit</Button>
 
-          <Popconfirm
-            title="Hapus buku?"
-            description="Buku ini akan dihapus."
-            onConfirm={() => handleDelete(params.row.id)}
-            okText="Ya"
-            cancelText="Tidak"
-          >
-            <Button danger>Hapus</Button>
-          </Popconfirm>
-        </div>
-      ),
-    },
-  ],
-  [handleEdit, handleDelete],
-);
+            <Popconfirm
+              title="Hapus buku?"
+              description="Buku ini akan dihapus."
+              onConfirm={() => handleDelete(params.row.id)}
+              okText="Ya"
+              cancelText="Tidak"
+            >
+              <Button danger>Hapus</Button>
+            </Popconfirm>
+          </div>
+        ),
+      },
+    ],
+    [handleEdit, handleDelete],
+  );
 
   return (
     <main className="min-h-screen bg-gray-100 p-4 md:p-8">
@@ -193,39 +175,31 @@ function Books() {
             </Button>
           </div>
 
-          {isLoading && (
-            <div className="flex justify-center py-10">
-              <Spin size="large" />
+          {isError ? (
+            <Empty description="Gagal mengambil data buku" />
+          ) : (
+            <div className="w-full">
+              <DataGrid
+                rows={data?.data ?? []}
+                columns={columns}
+                getRowId={(row) => row.id}
+                loading={isLoading}
+                pagination
+                paginationMode="server"
+                rowCount={data?.meta?.totalData ?? 0}
+                paginationModel={{
+                  page: page - 1,
+                  pageSize: limit,
+                }}
+                onPaginationModelChange={(model) => {
+                  setPage(model.page + 1);
+                  setLimit(model.pageSize);
+                }}
+                pageSizeOptions={[5, 10, 20]}
+                disableRowSelectionOnClick
+                autoHeight
+              />
             </div>
-          )}
-
-          {isError && <Empty description="Gagal mengambil data buku" />}
-
-          {!isLoading && !isError && (
-            <>
-              <div className="w-full">
-                <DataGrid
-                  rows={data?.data ?? []}
-                  columns={columns}
-                  getRowId={(row) => row.id}
-                  loading={isLoading}
-                  pagination
-                  paginationMode="server"
-                  rowCount={data?.meta?.totalData ?? 0}
-                  paginationModel={{
-                    page: page - 1,
-                    pageSize: limit,
-                  }}
-                  onPaginationModelChange={(model) => {
-                    setPage(model.page + 1);
-                    setLimit(model.pageSize);
-                  }}
-                  pageSizeOptions={[5, 10, 20]}
-                  disableRowSelectionOnClick
-                  autoHeight
-                />
-              </div>
-            </>
           )}
         </section>
       </div>
