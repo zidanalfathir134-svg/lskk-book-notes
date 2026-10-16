@@ -1,4 +1,3 @@
-
 import { Suspense } from 'react';
 import { createHashRouter, Navigate } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';

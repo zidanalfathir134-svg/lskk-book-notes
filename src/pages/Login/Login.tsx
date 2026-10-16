@@ -43,10 +43,8 @@ function Login() {
         replace: true,
       });
     } catch (error: unknown) {
-  message.error(
-    getErrorMessage(error, 'Terjadi kesalahan saat login'),
-  );
-}
+      message.error(getErrorMessage(error, 'Terjadi kesalahan saat login'));
+    }
   };
 
   return (
